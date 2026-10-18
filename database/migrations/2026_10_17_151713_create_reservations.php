@@ -15,10 +15,10 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('reservation_size');
-            $table->enum('reservation_status', array_column(ReservationStatus::cases(), 'value'))->default(ReservationStatus::BOOKED->value);
+            $table->integer('size');
+            $table->enum('status', array_column(ReservationStatus::cases(), 'value'))->default(ReservationStatus::BOOKED->value);
             $table->dateTime('reserved_at');
-            $table->dateTime('reservation_time');
+            $table->dateTime('start_date_time');
             $table->boolean('is_inside')->default(true);
             $table->string('notes')->nullable();
             $table->timestamps();

@@ -14,12 +14,12 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('phone')->unique();
+            $table->string('first_name', 30);
+            $table->string('last_name', 30);
+            $table->string('phone', 20)->unique();
             $table->enum('role', array_column(Role::cases(), 'value'))->default(Role::CUSTOMER->value);
-            $table->string('password_hash');
-            $table->string('email')->unique();
+            $table->string('password_hash', 30);
+            $table->string('email', 20)->unique();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();

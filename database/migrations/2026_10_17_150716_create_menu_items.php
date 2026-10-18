@@ -17,7 +17,8 @@ return new class extends Migration
             $table->decimal('price', 6, 2);
             $table->timestamps();
             $table->boolean('is_active')->default(true);
-            $table->string('description');
+            $table->string('imageUrl')->nullable();
+            $table->string('description')->nullable();
             $table->foreignId('category_id')->constrained('menu_categories')->onDelete('cascade');
         });
     }

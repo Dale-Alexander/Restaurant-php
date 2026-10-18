@@ -13,8 +13,16 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('served_by')->nullable();
             $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))->default(OrderStatus::Preparing);
-            $table->foreignId('reservation_id')->constrained()->onDelete('cascade');
+            $table->dateTime('closed_at')->nullable();
+            $table->decimal('total', 7, 2);
+            $table->decimal('subtotal', 7, 2);
+            $table->decimal('tax', 7, 2);
+            $table->decimal('tip', 5, 2)->default(0);
+            $table->decimal('discount', 5, 2)->default(0);
+            $table->foreignId('reservation_id')->nullable()->constrained()->onDelete('null');//walk-ins
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('null');//walk-ins and for convenience not to access the user thorugh a join between reservation and user and order tables
             $table->timestamps();
         });
     }
