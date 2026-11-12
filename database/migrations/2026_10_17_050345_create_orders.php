@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Enums\OrderStatus;
 
 return new class extends Migration
 {
@@ -14,7 +15,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('served_by')->nullable();
-            $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))->default(OrderStatus::Preparing);
+            $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))->default(OrderStatus::PREPARING);
             $table->dateTime('closed_at')->nullable();
             $table->decimal('total', 7, 2);
             $table->decimal('subtotal', 7, 2);
