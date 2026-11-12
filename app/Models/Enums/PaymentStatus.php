@@ -1,5 +1,5 @@
 <?php
-namespace App\Enums\Models{
+namespace App\Models\Enums{
 
 enum PaymentStatus:string{
 case PENDING = 'Pending';
