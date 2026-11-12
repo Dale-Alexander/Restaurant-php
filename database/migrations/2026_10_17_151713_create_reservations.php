@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('size');
             $table->enum('status', array_column(ReservationStatus::cases(), 'value'))->default(ReservationStatus::BOOKED->value);
-            $table->dateTime('reserved_at');
             $table->dateTime('start_date_time');
             $table->boolean('is_inside')->default(true);
             $table->string('notes')->nullable();
