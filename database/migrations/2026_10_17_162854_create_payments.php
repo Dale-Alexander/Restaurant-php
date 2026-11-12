@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Enums\PaymentMethod;
+use App\Models\Enums\PaymentStatus;
 
 return new class extends Migration
 {
