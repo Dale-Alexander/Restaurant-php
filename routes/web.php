@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User;
+use App\Http\Controllers\Admin;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +17,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/', [User\HomeController::class, 'index'])->name('index');
+Route::get('/menu', [User\MenuItemController::class, 'index'])->name('menu.index');
+Route::resource('reservations', User\ReservationController::class)->only('index', 'store', 'create');
+
+Route::prefix('admin')->name('admin.')->group(function(){
+Route::get('/', Admin\DashboardController::class, 'index')->name('index');
+Route::resource('items', Admin\MenuItemController::class);
+Route::resource('orders', Admin\OrderController::class);
+Route::resource('reservations', Admin\ReservationController::class);
 });
