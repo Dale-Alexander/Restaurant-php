@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Restaurant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand: #c8553d;
+            --brand-soft: #fbeae5;
+            --gold: #e0a458;
+            --ink: #1f1b18;
+            --sidebar: #1f1b18;
+            --muted: #8a817a;
+            --bg: #f7f4f1;
+            --card-radius: 1rem;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* ---------- Sidebar ---------- */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            min-height: 100vh;
+        }
+
+        .sidebar .brand {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar .brand i {
+            color: var(--gold);
+        }
+
+        .sidebar .nav-link {
+            color: #b9b0a8;
+            border-radius: .75rem;
+            padding: .7rem 1rem;
+            margin-bottom: .25rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            transition: all .2s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--brand);
+            box-shadow: 0 8px 20px rgba(200, 85, 61, .35);
+        }
+
+        .sidebar .section-label {
+            color: #6d655e;
+            font-size: .7rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .sidebar .promo {
+            background: linear-gradient(135deg, var(--brand), var(--gold));
+            border-radius: var(--card-radius);
+        }
+
+        /* ---------- Cards ---------- */
+        .card {
+            border: 0;
+            border-radius: var(--card-radius);
+            box-shadow: 0 2px 12px rgba(31, 27, 24, .05);
+        }
+
+        .stat-card {
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(31, 27, 24, .1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: .85rem;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+        }
+
+        .hero {
+            background:
+                linear-gradient(120deg, rgba(31, 27, 24, .92), rgba(200, 85, 61, .85)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200') center/cover;
+            color: #fff;
+            border-radius: var(--card-radius);
+        }
+
+        /* ---------- CSS bar chart ---------- */
+        .chart {
+            height: 220px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4%;
+        }
+
+        .chart .bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .chart .bar {
+            width: 100%;
+            max-width: 42px;
+            border-radius: .6rem .6rem .2rem .2rem;
+            background: var(--brand-soft);
+            transition: background .2s ease;
+            position: relative;
+        }
+
+        .chart .bar:hover,
+        .chart .bar.today {
+            background: linear-gradient(180deg, var(--gold), var(--brand));
+        }
+
+        .chart .bar span {
+            position: absolute;
+            top: -1.6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: .72rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity .2s ease;
+            white-space: nowrap;
+        }
+
+        .chart .bar:hover span,
+        .chart .bar.today span {
+            opacity: 1;
+        }
+
+        .chart small {
+            margin-top: .5rem;
+            color: var(--muted);
+        }
+
+        /* ---------- Tables & lists ---------- */
+        .table> :not(caption)>*>* {
+            padding: .9rem .75rem;
+            border-color: #f0ebe6;
+        }
+
+        .table thead th {
+            color: var(--muted);
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-weight: 600;
+        }
+
+        .badge-soft {
+            padding: .45em .8em;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: .72rem;
+        }
+
+        .badge-pending { background: #fff4e0; color: #b7791f; }
+        .badge-preparing { background: #e6f0ff; color: #2b6cb0; }
+        .badge-served { background: #e6f6ec; color: #2f855a; }
+        .badge-cancelled { background: #fde8e8; color: #c53030; }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+            font-size: .85rem;
+            color: #fff;
+        }
+
+        .dish-img {
+            width: 48px;
+            height: 48px;
+            border-radius: .75rem;
+            object-fit: cover;
+        }
+
+        .progress {
+            height: 6px;
+            background: #f0ebe6;
+            border-radius: 1rem;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--gold), var(--brand));
+            border-radius: 1rem;
+        }
+
+        .btn-brand {
+            background: var(--brand);
+            color: #fff;
+            border-radius: .75rem;
+        }
+
+        .btn-brand:hover {
+            background: #b04631;
+            color: #fff;
+        }
+
+        .search-box {
+            border-radius: .75rem;
+            border: 1px solid #ebe5df;
+            background: #fff;
+        }
+
+        .text-muted-2 {
+            color: var(--muted) !important;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar offcanvas-lg offcanvas-start p-4 d-flex flex-column" tabindex="-1" id="sidebar">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <a href="#" class="brand font-display"><i class="bi bi-fire me-2"></i>La Brasa</a>
+                <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+            </div>
+
+            <p class="section-label mb-2">Main</p>
+            <nav class="nav flex-column mb-4">
+                <a class="nav-link active" href="#"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+                <a class="nav-link" href="#"><i class="bi bi-receipt"></i> Orders</a>
+                <a class="nav-link" href="#"><i class="bi bi-calendar-check"></i> Reservations</a>
+                <a class="nav-link" href="#"><i class="bi bi-journal-text"></i> Menu Items</a>
+                <a class="nav-link" href="#"><i class="bi bi-tags"></i> Categories</a>
+            </nav>
+
+            <p class="section-label mb-2">Management</p>
+            <nav class="nav flex-column mb-4">
+                <a class="nav-link" href="#"><i class="bi bi-credit-card"></i> Payments</a>
+                <a class="nav-link" href="#"><i class="bi bi-people"></i> Users</a>
+                <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
+            </nav>
+
+            <div class="promo p-4 mt-auto text-white">
+                <i class="bi bi-stars fs-3"></i>
+                <h6 class="mt-2 mb-1 fw-semibold">Weekend Special</h6>
+                <p class="small mb-3 opacity-75">Launch a new seasonal menu for this weekend.</p>
+                <a href="#" class="btn btn-light btn-sm rounded-pill px-3 fw-semibold">Create Menu</a>
+            </div>
+        </aside>
+
+        <!-- ================= MAIN ================= -->
+        <main class="flex-grow-1 p-3 p-md-4 p-xl-5" style="min-width: 0;">
+
+            <!-- Top bar -->
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                <button class="btn btn-light d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="me-auto">
+                    <h1 class="font-display h3 mb-0">Good evening, Chef</h1>
+                    <p class="text-muted-2 small mb-0">Saturday, 14 November 2026</p>
+                </div>
+                <div class="search-box d-none d-md-flex align-items-center px-3 py-2">
+                    <i class="bi bi-search text-muted-2 me-2"></i>
+                    <input type="text" class="border-0 bg-transparent" style="outline: none;" placeholder="Search orders, dishes...">
+                </div>
+                <a href="#" class="btn btn-light position-relative rounded-3">
+                    <i class="bi bi-bell"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                </a>
+                <a href="#" class="d-flex align-items-center gap-2 text-reset">
+                    <div class="avatar" style="background: var(--brand);">AD</div>
+                    <div class="d-none d-sm-block lh-sm">
+                        <div class="fw-semibold small">Admin</div>
+                        <div class="text-muted-2" style="font-size: .75rem;">Manager</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Hero banner -->
+            <div class="hero p-4 p-md-5 mb-4">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-8">
+                        <span class="badge rounded-pill bg-white bg-opacity-25 mb-3 px-3 py-2">
+                            <i class="bi bi-circle-fill text-success me-1" style="font-size: .5rem;"></i> Restaurant is open
+                        </span>
+                        <h2 class="font-display mb-2">Tonight looks busy!</h2>
+                        <p class="mb-0 opacity-75">18 reservations booked and 12 orders currently in the kitchen.</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="#" class="btn btn-light rounded-pill px-4 fw-semibold me-2"><i class="bi bi-plus-lg me-1"></i> New Order</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="row g-3 g-xl-4 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="stat-icon" style="background: var(--brand-soft); color: var(--brand);"><i class="bi bi-cash-stack"></i></div>
+                            <span class="badge-soft badge-served"><i class="bi bi-arrow-up-short"></i>12.5%</span>
+                        </div>
+                        <p class="text-muted-2 small mb-1">Today's Revenue</p>
+                        <h3 class="fw-bold mb-0">$4,820.50</h3>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="stat-icon" style="background: #e6f0ff; color: #2b6cb0;"><i class="bi bi-bag-check"></i></div>
+                            <span class="badge-soft badge-served"><i class="bi bi-arrow-up-short"></i>8.2%</span>
+                        </div>
+                        <p class="text-muted-2 small mb-1">Total Orders</p>
+                        <h3 class="fw-bold mb-0">128</h3>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="stat-icon" style="background: #fff4e0; color: #b7791f;"><i class="bi bi-calendar-heart"></i></div>
+                            <span class="badge-soft badge-cancelled"><i class="bi bi-arrow-down-short"></i>3.1%</span>
+                        </div>
+                        <p class="text-muted-2 small mb-1">Reservations</p>
+                        <h3 class="fw-bold mb-0">18</h3>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="stat-icon" style="background: #e6f6ec; color: #2f855a;"><i class="bi bi-people"></i></div>
+                            <span class="badge-soft badge-served"><i class="bi bi-arrow-up-short"></i>5.4%</span>
+                        </div>
+                        <p class="text-muted-2 small mb-1">New Customers</p>
+                        <h3 class="fw-bold mb-0">42</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue chart + Top dishes -->
+            <div class="row g-3 g-xl-4 mb-4">
+                <div class="col-xl-8">
+                    <div class="card p-4 h-100">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                            <div>
+                                <h5 class="fw-semibold mb-0">Weekly Revenue</h5>
+                                <p class="text-muted-2 small mb-0">8 Nov - 14 Nov 2026</p>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <a href="#" class="btn btn-brand">Week</a>
+                                <a href="#" class="btn btn-light">Month</a>
+                                <a href="#" class="btn btn-light">Year</a>
+                            </div>
+                        </div>
+                        <div class="chart pt-4">
+                            <div class="bar-wrap"><div class="bar" style="height: 55%;"><span>$2,940</span></div><small>Sun</small></div>
+                            <div class="bar-wrap"><div class="bar" style="height: 40%;"><span>$2,180</span></div><small>Mon</small></div>
+                            <div class="bar-wrap"><div class="bar" style="height: 48%;"><span>$2,610</span></div><small>Tue</small></div>
+                            <div class="bar-wrap"><div class="bar" style="height: 62%;"><span>$3,350</span></div><small>Wed</small></div>
+                            <div class="bar-wrap"><div class="bar" style="height: 70%;"><span>$3,780</span></div><small>Thu</small></div>
+                            <div class="bar-wrap"><div class="bar" style="height: 85%;"><span>$4,560</span></div><small>Fri</small></div>
+                            <div class="bar-wrap"><div class="bar today" style="height: 90%;"><span>$4,820</span></div><small class="fw-semibold text-dark">Sat</small></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4">
+                    <div class="card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-semibold mb-0">Top Dishes</h5>
+                            <a href="#" class="small fw-semibold" style="color: var(--brand);">View all</a>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <img class="dish-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=200" alt="Ribeye Steak">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold small">Grilled Ribeye</span><span class="small text-muted-2">86 sold</span></div>
+                                <div class="progress mt-2"><div class="progress-bar" style="width: 92%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <img class="dish-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200" alt="Pizza">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold small">Margherita Pizza</span><span class="small text-muted-2">72 sold</span></div>
+                                <div class="progress mt-2"><div class="progress-bar" style="width: 78%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <img class="dish-img" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200" alt="Salad">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold small">Garden Salad</span><span class="small text-muted-2">58 sold</span></div>
+                                <div class="progress mt-2"><div class="progress-bar" style="width: 62%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <img class="dish-img" src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=200" alt="Dessert">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold small">Berry Cheesecake</span><span class="small text-muted-2">41 sold</span></div>
+                                <div class="progress mt-2"><div class="progress-bar" style="width: 45%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent orders + Reservations -->
+            <div class="row g-3 g-xl-4 mb-4">
+                <div class="col-xl-8">
+                    <div class="card h-100">
+                        <div class="d-flex justify-content-between align-items-center p-4 pb-2">
+                            <h5 class="fw-semibold mb-0">Recent Orders</h5>
+                            <a href="#" class="small fw-semibold" style="color: var(--brand);">View all</a>
+                        </div>
+                        <div class="table-responsive px-2">
+                            <table class="table align-middle mb-2">
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Customer</th>
+                                        <th>Table</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th class="text-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-semibold">#1048</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar" style="background: #e0a458; width: 34px; height: 34px;">SM</div>
+                                                Sarah Mitchell
+                                            </div>
+                                        </td>
+                                        <td>T-04</td>
+                                        <td class="fw-semibold">$86.40</td>
+                                        <td><span class="badge-soft badge-preparing">Preparing</span></td>
+                                        <td class="text-end"><a href="#" class="btn btn-sm btn-light rounded-3"><i class="bi bi-three-dots"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">#1047</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar" style="background: #5a8f7b; width: 34px; height: 34px;">JD</div>
+                                                James Dalton
+                                            </div>
+                                        </td>
+                                        <td>T-11</td>
+                                        <td class="fw-semibold">$142.00</td>
+                                        <td><span class="badge-soft badge-served">Served</span></td>
+                                        <td class="text-end"><a href="#" class="btn btn-sm btn-light rounded-3"><i class="bi bi-three-dots"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">#1046</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar" style="background: #6b5b95; width: 34px; height: 34px;">AP</div>
+                                                Aisha Patel
+                                            </div>
+                                        </td>
+                                        <td>T-02</td>
+                                        <td class="fw-semibold">$54.90</td>
+                                        <td><span class="badge-soft badge-pending">Pending</span></td>
+                                        <td class="text-end"><a href="#" class="btn btn-sm btn-light rounded-3"><i class="bi bi-three-dots"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">#1045</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar" style="background: #c8553d; width: 34px; height: 34px;">LK</div>
+                                                Liam Kowalski
+                                            </div>
+                                        </td>
+                                        <td>T-07</td>
+                                        <td class="fw-semibold">$210.75</td>
+                                        <td><span class="badge-soft badge-served">Served</span></td>
+                                        <td class="text-end"><a href="#" class="btn btn-sm btn-light rounded-3"><i class="bi bi-three-dots"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold">#1044</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar" style="background: #3d5a80; width: 34px; height: 34px;">EM</div>
+                                                Emma Moreau
+                                            </div>
+                                        </td>
+                                        <td>Takeaway</td>
+                                        <td class="fw-semibold">$38.20</td>
+                                        <td><span class="badge-soft badge-cancelled">Cancelled</span></td>
+                                        <td class="text-end"><a href="#" class="btn btn-sm btn-light rounded-3"><i class="bi bi-three-dots"></i></a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4">
+                    <div class="card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-semibold mb-0">Today's Reservations</h5>
+                            <a href="#" class="btn btn-sm btn-brand"><i class="bi bi-plus-lg"></i></a>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                            <div class="text-center px-2 py-1 rounded-3" style="background: var(--brand-soft); color: var(--brand); min-width: 62px;">
+                                <div class="fw-bold">18:30</div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Olivia Bennett</div>
+                                <div class="text-muted-2" style="font-size: .78rem;"><i class="bi bi-people me-1"></i>4 guests &middot; Table 6</div>
+                            </div>
+                            <span class="badge-soft badge-served">Confirmed</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                            <div class="text-center px-2 py-1 rounded-3" style="background: var(--brand-soft); color: var(--brand); min-width: 62px;">
+                                <div class="fw-bold">19:00</div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Noah Fernandes</div>
+                                <div class="text-muted-2" style="font-size: .78rem;"><i class="bi bi-people me-1"></i>2 guests &middot; Table 3</div>
+                            </div>
+                            <span class="badge-soft badge-pending">Pending</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                            <div class="text-center px-2 py-1 rounded-3" style="background: var(--brand-soft); color: var(--brand); min-width: 62px;">
+                                <div class="fw-bold">19:45</div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Chen Wei</div>
+                                <div class="text-muted-2" style="font-size: .78rem;"><i class="bi bi-people me-1"></i>8 guests &middot; Table 12</div>
+                            </div>
+                            <span class="badge-soft badge-served">Confirmed</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="text-center px-2 py-1 rounded-3" style="background: var(--brand-soft); color: var(--brand); min-width: 62px;">
+                                <div class="fw-bold">20:30</div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">Grace Okafor</div>
+                                <div class="text-muted-2" style="font-size: .78rem;"><i class="bi bi-people me-1"></i>3 guests &middot; Table 9</div>
+                            </div>
+                            <span class="badge-soft badge-served">Confirmed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment methods + Quick actions -->
+            <div class="row g-3 g-xl-4">
+                <div class="col-lg-6">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-semibold mb-4">Payment Methods</h5>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1"><span><i class="bi bi-credit-card me-2 text-muted-2"></i>Card</span><span class="fw-semibold">58%</span></div>
+                            <div class="progress"><div class="progress-bar" style="width: 58%;"></div></div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1"><span><i class="bi bi-cash me-2 text-muted-2"></i>Cash</span><span class="fw-semibold">27%</span></div>
+                            <div class="progress"><div class="progress-bar" style="width: 27%;"></div></div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between small mb-1"><span><i class="bi bi-phone me-2 text-muted-2"></i>Mobile Pay</span><span class="fw-semibold">15%</span></div>
+                            <div class="progress"><div class="progress-bar" style="width: 15%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-semibold mb-4">Quick Actions</h5>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <a href="#" class="d-block text-center p-3 rounded-4 stat-card text-reset" style="background: var(--brand-soft);">
+                                    <i class="bi bi-plus-circle fs-4" style="color: var(--brand);"></i>
+                                    <div class="small fw-semibold mt-1">Add Menu Item</div>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="#" class="d-block text-center p-3 rounded-4 stat-card text-reset" style="background: #e6f0ff;">
+                                    <i class="bi bi-calendar-plus fs-4" style="color: #2b6cb0;"></i>
+                                    <div class="small fw-semibold mt-1">New Reservation</div>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="#" class="d-block text-center p-3 rounded-4 stat-card text-reset" style="background: #fff4e0;">
+                                    <i class="bi bi-tags fs-4" style="color: #b7791f;"></i>
+                                    <div class="small fw-semibold mt-1">Add Category</div>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="#" class="d-block text-center p-3 rounded-4 stat-card text-reset" style="background: #e6f6ec;">
+                                    <i class="bi bi-file-earmark-bar-graph fs-4" style="color: #2f855a;"></i>
+                                    <div class="small fw-semibold mt-1">View Reports</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-muted-2 small mt-5 mb-0">&copy; 2026 La Brasa Restaurant. All rights reserved.</p>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
