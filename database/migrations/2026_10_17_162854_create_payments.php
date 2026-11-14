@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('payment_method', array_column(PaymentMethod::cases(), 'value'));
             $table->decimal('amount', 7, 2);
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->enum('status', array_column(PaymentStatus::cases(), 'value'))->default(PaymentStatus::PENDING);
+            $table->enum('status', array_column(PaymentStatus::cases(), 'value'))->default(PaymentStatus::PENDING->value);
             $table->timestamps();
         });
     }

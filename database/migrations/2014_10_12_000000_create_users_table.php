@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('last_name', 30);
             $table->string('phone', 20)->unique();
             $table->enum('role', array_column(Role::cases(), 'value'))->default(Role::CUSTOMER->value);
-            $table->string('password_hash', 30);
-            $table->string('email', 20)->unique();
+            $table->string('password_hash', 100);
+            $table->string('email', 30)->unique();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();

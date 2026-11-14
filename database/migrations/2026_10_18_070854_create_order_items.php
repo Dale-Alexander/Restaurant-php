@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('menu_item_id')->constrained()->onDelete('restrict');
             //The above doesnt allow a menu_item to be deleted when it is referenced by a record in this table
-            $table->integer('quanity');
+            $table->integer('quantity');
             $table->string('name_snapshot');
             $table->decimal('price_snapshot', 6, 2);
             $table->string('notes')->nullable();
