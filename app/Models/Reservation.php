@@ -27,8 +27,6 @@ class Reservation extends Model
         'status' => ReservationStatus::class
     ];
 
-<<<<<<< Updated upstream
-=======
     // The customer who made the reservation
     public function user(): BelongsTo
     {
@@ -46,5 +44,4 @@ class Reservation extends Model
     {
         return $this->hasMany(Order::class);
     }
->>>>>>> Stashed changes
 }
