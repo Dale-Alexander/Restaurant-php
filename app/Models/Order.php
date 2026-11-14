@@ -17,10 +17,44 @@ class Order extends Model
         'tip',
         'discount',
         'reservation_id',
-        'user_id'
+        'user_id',
+        'dining_table_id'
     ];
     protected $casts = [
         'closed_at' => 'datetime',
         'status' => OrderStatus::class
     ];
+<<<<<<< Updated upstream
+=======
+
+    // The customer who placed the order (nullable for walk-ins)
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // The reservation this order came from (nullable for walk-ins)
+    public function reservation(): BelongsTo
+    {
+        return $this->belongsTo(Reservation::class);
+    }
+
+    // The table the order is served at (nullable for takeaway)
+    public function diningTable(): BelongsTo
+    {
+        return $this->belongsTo(DiningTable::class);
+    }
+
+    // The lines (dishes) on this order
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    // An order can be paid in several payments (e.g. split bill)
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+>>>>>>> Stashed changes
 }

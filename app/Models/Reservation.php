@@ -16,7 +16,8 @@ class Reservation extends Model
         'size',
         'reserved_at',
         'notes',
-        'is_inside'
+        'is_inside',
+        'dining_table_id'
      ];
 
      protected $casts = [
@@ -26,4 +27,24 @@ class Reservation extends Model
         'status' => ReservationStatus::class
     ];
 
+<<<<<<< Updated upstream
+=======
+    // The customer who made the reservation
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // The table assigned to this reservation (nullable until staff assign one)
+    public function diningTable(): BelongsTo
+    {
+        return $this->belongsTo(DiningTable::class);
+    }
+
+    // Orders placed during this reservation
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+>>>>>>> Stashed changes
 }

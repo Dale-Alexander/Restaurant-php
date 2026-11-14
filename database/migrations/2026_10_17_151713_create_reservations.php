@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('dining_table_id')->nullable()->constrained()->nullOnDelete();//null until staff assign a table
             $table->integer('size');
             $table->enum('status', array_column(ReservationStatus::cases(), 'value'))->default(ReservationStatus::BOOKED->value);
             $table->dateTime('reserved_at');
