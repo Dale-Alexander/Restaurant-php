@@ -4,9 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Enums\ReservationStatus;
+
 class Reservation extends Model
 {
     use HasFactory;
@@ -18,7 +16,8 @@ class Reservation extends Model
         'size',
         'reserved_at',
         'notes',
-        'is_inside'
+        'is_inside',
+        'dining_table_id'
      ];
 
      protected $casts = [
@@ -28,10 +27,18 @@ class Reservation extends Model
         'status' => ReservationStatus::class
     ];
 
+<<<<<<< Updated upstream
+=======
     // The customer who made the reservation
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // The table assigned to this reservation (nullable until staff assign one)
+    public function diningTable(): BelongsTo
+    {
+        return $this->belongsTo(DiningTable::class);
     }
 
     // Orders placed during this reservation
@@ -39,4 +46,5 @@ class Reservation extends Model
     {
         return $this->hasMany(Order::class);
     }
+>>>>>>> Stashed changes
 }

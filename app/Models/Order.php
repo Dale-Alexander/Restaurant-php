@@ -20,7 +20,8 @@ class Order extends Model
         'tip',
         'discount',
         'reservation_id',
-        'user_id'
+        'user_id',
+        'dining_table_id'
     ];
     protected $casts = [
         'closed_at' => 'datetime',
@@ -37,6 +38,12 @@ class Order extends Model
     public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class);
+    }
+
+    // The table the order is served at (nullable for takeaway)
+    public function diningTable(): BelongsTo
+    {
+        return $this->belongsTo(DiningTable::class);
     }
 
     // The lines (dishes) on this order

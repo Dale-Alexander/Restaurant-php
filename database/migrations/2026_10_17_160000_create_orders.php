@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('discount', 5, 2)->default(0);
             $table->foreignId('reservation_id')->nullable()->constrained()->nullOnDelete();//walk-ins
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();//walk-ins and for convenience not to access the user thorugh a join between reservation and user and order tables
+            $table->foreignId('dining_table_id')->nullable()->constrained()->nullOnDelete();//null for takeaway orders
             $table->timestamps();
         });
     }
