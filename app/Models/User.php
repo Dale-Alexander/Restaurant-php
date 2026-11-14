@@ -4,9 +4,11 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Enums\Role;
 
 
 class User extends Authenticatable
@@ -49,4 +51,16 @@ class User extends Authenticatable
         //in mySQL, booleans are stored as 0 or 1. Therefore,
         //we cast is_Active to a boolean so $user->isactive always evaluates to true or false
     ];
+
+    // A user (customer) can make many reservations
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    // A user can have many orders
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 }
