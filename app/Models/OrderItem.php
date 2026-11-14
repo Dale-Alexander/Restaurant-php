@@ -4,31 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderItem extends Model
 {
     protected $fillable = [
-        'name_snapshot',
+        'name_snaphot',
         'price_snapshot',
         'notes',
         'quantity',
         'menu_item_id',
         'order_id'
     ];
-
-    // The order this line belongs to
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
-    }
-
-    // The menu item that was ordered
-    public function menuItem(): BelongsTo
-    {
-        return $this->belongsTo(MenuItem::class);
-    }
-
     /*
         {
         Schema::create('order_items', function (Blueprint $table) {
