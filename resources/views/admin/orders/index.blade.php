@@ -6,7 +6,26 @@
 
 @section('content')
 
+    @php
+        // Presentation only — the numbers come from the controller ($orders, $counts, $revenue).
+        $stats = [
+            ['label' => 'Total Orders', 'value' => $orders->total(),                     'icon' => 'bi-receipt',         'bg' => 'var(--brand-soft)', 'fg' => 'var(--brand)'],
+            ['label' => 'Pending',      'value' => $counts['Pending'] ?? 0,              'icon' => 'bi-hourglass-split', 'bg' => '#fff4e0',           'fg' => '#b7791f'],
+            ['label' => 'Preparing',    'value' => $counts['Preparing'] ?? 0,            'icon' => 'bi-fire',            'bg' => '#e6f0ff',           'fg' => '#2b6cb0'],
+            ['label' => 'Revenue',      'value' => '$' . number_format($revenue ?? 0, 2), 'icon' => 'bi-cash-stack',      'bg' => '#e6f6ec',           'fg' => '#2f855a'],
+        ];
+
+        // Payment status (App\Models\Enums\PaymentStatus value) => badge CSS class from layout.admin
+        $paymentBadge = [
+            'Pending'   => 'badge-pending',
+            'Succeeded' => 'badge-served',
+            'Failed'    => 'badge-cancelled',
+            'Refunded'  => 'badge-preparing',
+        ];
+    @endphp
+
     <div class="row g-3 g-xl-4 mb-4">
+        @foreach ($stats as $stat)
             <div class="col-6 col-xl-3">
                 <div class="card stat-card p-3 p-md-4 h-100">
                     <div class="d-flex align-items-center gap-3">
@@ -14,12 +33,13 @@
                             <i class="bi {{ $stat['icon'] }}"></i>
                         </div>
                         <div>
-                            <div class="text-muted-2 small"></div>
-                            <div class="h4 mb-0 fw-semibold"></div>
+                            <div class="text-muted-2 small">{{ $stat['label'] }}</div>
+                            <div class="h4 mb-0 fw-semibold">{{ $stat['value'] }}</div>
                         </div>
                     </div>
                 </div>
             </div>
+        @endforeach
     </div>
 
     <div class="card p-3 p-md-4">
@@ -31,7 +51,7 @@
                                 class="nav-link rounded-pill px-3 py-1 small {{ $loop->first ? 'active' : '' }}"
                                 data-status="{{ $tab }}">
                             {{ $tab }}
-                            <span class="opacity-75 ms-1">{{ $tab === 'All' ? count($orders) : ($counts[$tab] ?? 0) }}</span>
+                            <span class="opacity-75 ms-1">{{ $tab === 'All' ? $orders->total() : ($counts[$tab] ?? 0) }}</span>
                         </button>
                     </li>
                 @endforeach
@@ -55,38 +75,35 @@
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
-                        <tr data-status="{{ $order['status'] }}">
+                        <tr data-status="{{ $order->status->value }}">
                             <td>
-                                <div class="fw-semibold"></div>
-                                <div class="text-muted-2 small"></div>
+                                <div class="fw-semibold">#{{ $order->id }}</div>
+                                <div class="text-muted-2 small">{{ $order->created_at->format('g:i A') }}</div>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar" style="background: {{ $order['color'] }};"></div>
-                                    <div class="lh-sm">
-                                        <div class="fw-semibold small"></div>
-                                        <div class="text-muted-2" style="font-size: .75rem;"></div>
-                                    </div>
-                                </div>
+                                <div class="fw-semibold small">{{ $order->user->first_name ?? 'Walk-in' }} {{ $order->user->last_name ?? '' }}</div>
+                                <div class="text-muted-2" style="font-size: .75rem;">{{ $order->user->phone ?? '' }}</div>
                             </td>
-                            <td><span class="badge bg-light text-dark border"></span></td>
+                            <td><span class="badge bg-light text-dark border">{{ $order->diningTable->number ?? 'Takeaway' }}</span></td>
                             <td class="small">
-                                {{ collect($order['items'])->sum('qty') }} items
+                                {{ $order->orderItems->sum('quantity') }} items
                                 <div class="text-muted-2 text-truncate" style="max-width: 180px; font-size: .75rem;">
-                                    {{ collect($order['items'])->pluck('name')->join(', ') }}
+                                    {{ $order->orderItems->pluck('name_snapshot')->join(', ') }}
                                 </div>
                             </td>
-                            <td class="fw-semibold">${{ number_format($order['total'], 2) }}</td>
+                            <td class="fw-semibold">${{ number_format($order->total, 2) }}</td>
                             <td>
-                                <span class="badge-soft {{ $paymentBadge[$order['payment']['status']] }}">{{$order['payment']['status']}}</span>
-                                <div class="text-muted-2 mt-1" style="font-size: .75rem;">{{ $order['payment']['method'] }}</div>
+                                @foreach ($order->payments as $payment)
+                                    <span class="badge-soft {{ $paymentBadge[$payment->status->value] }}">{{ $payment->status->value }}</span>
+                                    <div class="text-muted-2 mt-1" style="font-size: .75rem;">{{ $payment->payment_method->value }}</div>
+                                @endforeach
                             </td>
                             <td>
-                                <span class="badge-soft badge-{{ strtolower($order['status']) }}"></span>
+                                <span class="badge-soft badge-{{ strtolower($order->status->value) }}">{{ $order->status->value }}</span>
                             </td>
                             <td class="text-end text-nowrap">
                                 <button type="button" class="btn btn-light btn-sm rounded-3"
-                                        data-bs-toggle="modal" data-bs-target="#order-{{ $order['id'] }}" title="View">
+                                        data-bs-toggle="modal" data-bs-target="#order-{{ $order->id }}" title="View">
                                     <i class="bi bi-eye"></i>
                                 </button>
                                 <div class="dropdown d-inline-block">
@@ -103,6 +120,7 @@
                                 </div>
                             </td>
                         </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -149,26 +167,26 @@
                                 <tr><th>Item</th><th class="text-center">Qty</th><th class="text-end">Price</th></tr>
                             </thead>
                             <tbody>
-                                @foreach ($order['items'] as $item)
+                                @foreach ($order->orderItems as $item)
                                     <tr>
-                                        <td class="small">{{ $item['name'] }}</td>
-                                        <td class="small text-center">{{ $item['qty'] }}</td>
-                                        <td class="small text-end">${{ number_format($item['qty'] * $item['price'], 2) }}</td>
+                                        <td class="small">{{ $item->name_snapshot }}</td>
+                                        <td class="small text-center">{{ $item->quantity }}</td>
+                                        <td class="small text-end">${{ number_format($item->quantity * $item->price_snapshot, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
 
                         <div class="small">
-                            <div class="d-flex justify-content-between mb-1"><span class="text-muted-2">Subtotal</span><span>${{ number_format($order['subtotal'], 2) }}</span></div>
-                            @if ($order['discount'] > 0)
-                                <div class="d-flex justify-content-between mb-1 text-success"><span>Discount</span><span>−${{ number_format($order['discount'], 2) }}</span></div>
+                            <div class="d-flex justify-content-between mb-1"><span class="text-muted-2">Subtotal</span><span>${{ number_format($order->subtotal, 2) }}</span></div>
+                            @if ($order->discount > 0)
+                                <div class="d-flex justify-content-between mb-1 text-success"><span>Discount</span><span>−${{ number_format($order->discount, 2) }}</span></div>
                             @endif
-                            <div class="d-flex justify-content-between mb-2"><span class="text-muted-2">Tax (8%)</span><span>${{ number_format($order['tax'], 2) }}</span></div>
-                            <div class="d-flex justify-content-between fw-semibold fs-6 pt-2 border-top"><span>Total</span><span>${{ number_format($order['total'], 2) }}</span></div>
+                            <div class="d-flex justify-content-between mb-2"><span class="text-muted-2">Tax (8%)</span><span>${{ number_format($order->tax, 2) }}</span></div>
+                            <div class="d-flex justify-content-between fw-semibold fs-6 pt-2 border-top"><span>Total</span><span>${{ number_format($order->total, 2) }}</span></div>
                             <div class="d-flex justify-content-between mt-2">
-                                <span class="text-muted-2">Payment ({{ $order['payment']['method'] }})</span>
-                                <span class="badge-soft {{ $paymentBadge[$order['payment']['status']] }}">{{ $order['payment']['status'] }}</span>
+                                <span class="text-muted-2">Payment ({{ $order->payment->method }})</span>
+                                <span class="badge-soft {{ $paymentBadge[$order['payment']['status']] }}">{{ $order->payment->status}}</span>
                             </div>
                         </div>
                     </div>
