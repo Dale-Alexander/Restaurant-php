@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Models\Payment;
+use App\Models\Enums\PaymentStatus;
+
 
 class OrderController extends Controller
 {
@@ -17,16 +20,19 @@ class OrderController extends Controller
         //max(..., 1) enforces a minimum of 1 because someone might pass ?perpage=0 or ?perpage=-10
         //min(enforces a minimum so users cant exceed 100 rows)
 
-        $orders = Order::select('id', 'user_id', 'status', 'total', 'discount', 'created_at')
+        $orders = Order::select('id', 'user_id', 'status', 'total', 'discount','subtotal', 'tax', 'created_at, dining_table_id')
             ->with([
-                'orderItems:id,order_id,price_snap_shot,name_snapshot,quantity',
+                'orderItems:id,order_id,price_snapshot,name_snapshot,quantity',
                 'payments:id,order_id,amount,payment_method,status',
                 'user:id,first_name,last_name,phone',
+                'diningTable:id, number'
             ])
             ->latest()
             ->paginate($perPage)   // reads ?page= from the request automatically
             ->withQueryString();   // keeps ?per_page / filters in the page links
+        $revenue = Payment::where('status', PaymentStatus::SUCCEEDED)->sum('amount');
+        $counts = Order::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');// ['Pending' => 4, 'Served' => 31, ...]
 
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders', 'revenue', 'counts'));
     }
 }

@@ -4,14 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
-use App\Models;
+use App\Models\Payment;
+use App\Models\Order;
+use App\Models\Reservation;
+use App\Models\Enums\PaymentStatus;
+use App\Models\Enums\ReservationStatus;
 
 class DashboardController extends Controller
 {
     public function index($pageNo, $pageSize = 10){
         $dashboard_stats = [
             'today_revenue' => Payment::whereDate('created_at', today())->sum('amount'),
-            'total_revenue' -> Payment::sum('amount'),
+            'total_revenue' => Payment::where('status', PaymentStatus::SUCCEEDED)->sum('amount'),
             'total_orders' => Order::count(),
             'today_orders' => Order::whereDate('created_at', today())->count(),
             'total_reservations' => Reservation::count(),
